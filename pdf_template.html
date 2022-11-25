@@ -1,0 +1,56 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hi</title>
+</head>
+<body>
+    <h1 style="text-align:center"><strong>Аналитика по зарплатам и городам для профессии {{name}}</strong></h1>
+    <img src="C:\Users\timbo\PycharmProjects\pythonProject1\report.png" width="800" align="center">
+    <h1 style="text-align:center; ">Статистика по годам</h1>
+    <table style="font-family: Verdana, Geneva, Tahoma, sans-serif; width: 100%; border-collapse:collapse;">
+        <thead>
+            <tr>
+                {% for column_cells in sheet_1.columns: %}
+                <th style="border: 1px solid black; font-size: 18px; padding: 5px; text-align:center">
+                    {{column_cells[0].value}}
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in range(2, sheet_1.max_row + 1): %}
+            <tr>
+                {% for col in range(1, sheet_1.max_column + 1): %}
+                <td style="padding: 5px; border: 1px solid black; font-size: 14px; font-weight: normal; text-align:center">
+                   {{sheet_1.cell(row, col).value}} 
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h1 style="text-align:center">Статистика по городам</h1>
+    <table style="font-family: Verdana, Geneva, Tahoma, sans-serif; width: 100%; border-collapse:collapse;">
+        <thead>
+            <tr>
+                {% for column_cells in sheet_2.columns: %}
+                <th style="border: 1px solid black; font-size: 18px; padding: 5px; text-align:center">
+                    {{column_cells[0].value}}
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in range(2, sheet_2.max_row + 1): %}
+            <tr>
+                {% for col in range(1, sheet_2.max_column + 1): %}
+                <td style="padding: 5px; border: 1px solid black; font-size: 14px; font-weight: normal; text-align:center">
+                   {{sheet_2.cell(row, col).value}}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
