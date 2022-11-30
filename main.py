@@ -1,7 +1,7 @@
 import Report
 import table
 a = input()
-if a == "Статистика":
+if a == "Статистика профессий":
     table.getetable()
 elif a == "Вакансии":
     Report.get_report()
