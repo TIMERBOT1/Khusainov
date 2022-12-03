@@ -8,11 +8,25 @@ import pdfkit
 from jinja2 import FileSystemLoader, Environment
 
 class DataSet:
+    """Класс для распаковки csv
+    Attributes:
+        file_name (string): Название распаковываемого csv-файла
+        vacancies_objects (list): Данные из csv-файла
+    """
     def __init__(self, file_name):
+        """Инициализирует объект DataSet
+        Args:
+            file_name (string): имя csv-файла
+        """
         self.file_name = file_name
         self.vacancies_objects = DataSet.сsv_reader(file_name)
 
     def сsv_reader(file_name):
+        """
+        Извлекает данные из csv-файла и складывает их в список
+        Args: file_name(string): название csv-файла
+        :return: list: список с данными из csv-файла
+        """
         file_csv = open(file_name, encoding='utf_8_sig')
         reader_csv = csv.reader(file_csv)
         listData = []
@@ -36,16 +50,41 @@ class DataSet:
 
 
 class Salary:
+    """
+    Класс для представления зарплаты
+
+    Attributes:
+        salary(int): средняя зарплата в рублях
+        salary_currency(string): Валюта оклада
+    """
 
     def __init__(self, salary_from, salary_to, salary_currency):
+        """
+        Инициализирует объект Salary, производит конвертацию зарплаты в указанную валюту
+        :param salary_from (str or int or float): Нижняя граница вилки оклада
+        :param salary_to (str or int or float): Верхняя граница вилки оклада
+        :param salary_currency (str): Валюта оклада
+        """
         currency_to_rub = {"AZN": 35.68, "BYR": 23.91, "EUR": 59.90, "GEL": 21.74, "KGS": 0.76, "KZT": 0.13, "RUR": 1,
                            "UAH": 1.64, "USD": 60.66, "UZS": 0.0055}
         self.salary = int((float(salary_to) + float(salary_from))/2 * currency_to_rub[salary_currency])
         self.salary_currency = salary_currency
 
 class Vacancy:
+    """
+    Класс для представления вакансии
 
+    Attributes:
+        name(str): название вакансии
+        salary(Salary): Зарплата
+        area_name(str): Регион
+        published_at(int): Дата публикации
+    """
     def __init__(self, vacanlist):
+        """
+        Инициализирует объект Vacancy
+        :param vacanlist: список с данными по вакансии
+        """
         self.name = vacanlist[0]
         self.salary = Salary(vacanlist[1], vacanlist[2], vacanlist[3])
         self.area_name = vacanlist[4]
@@ -53,19 +92,40 @@ class Vacancy:
 
 
 class InputConnect:
+    """
+    Класс для формирования статистических данных
+    Attributes:
+        params(list): список с названием файла и вакансии
+        filename(string)
+        name(string):
+    """
 
     def __init__(self):
+        """
+        Инициализирует объект InputConnect
+        """
         self.params = InputConnect.get_params(self)
         self.filename = self.params[0]
         self.name = self.params[1]
 
 
     def get_params(self):
+        """
+        Считывает данные с клавиатуры для формирования статистики
+        :return:
+        """
         filename = input('Введите название файла: ')
         name = input('Введите название профессии: ')
         return [filename, name]
 
-    def statistics_for_years(self, name):
+    def statistics_for_years(self, name, a):
+        """
+        Формирует статистические данные
+
+        :param name: Название вакансии
+        :param a: Это надо, чтобы работало
+        :return: list: статистические данные
+        """
         list1 = a.vacancies_objects
         def cities_statistic():
             if city_salary.__contains__(i.area_name):
@@ -118,8 +178,14 @@ class InputConnect:
 
 
 class Report:
-
+    """
+    Класс для формирования отчётов
+    """
     def generate_pdf(self):
+        """
+        Формирует отчёт в pdf
+        :return:
+        """
         options = {'enable-local-file-access': None}
         image = 'report.png'
         name = 'Программист'
@@ -132,7 +198,13 @@ class Report:
         config = pdfkit.configuration(wkhtmltopdf=r'D:\wkhtmltopdf\bin\wkhtmltopdf.exe')
         pdfkit.from_string(pdf_template, 'out.pdf', configuration=config, options=options)
 
-    def generate_image(self, statistic):
+    def generate_image(self, statistic, m):
+        """
+        Генерирует картинку с диаграммами
+        :param statistic: (list) статистические данные
+        :param m: это надо
+        :return:
+        """
         salary, count, salary_city, city_count, vacancy_salary, vacancy_count = statistic
 
         def bar_chart(first_dict, second_dict, label1, label2):
@@ -173,7 +245,14 @@ class Report:
         plt.tight_layout()
         plt.savefig('report.png')
 
-    def generate_exel(self, statistic, name):
+    def generate_exel(self, statistic, name, m):
+        """
+        Формирует табличку со статистикой
+        :param statistic: list: статистические данные
+        :param name: Название вакансии
+        :param m: это надо
+        :return:
+        """
 
         def format_to_precent(e):
             e = round(e*100, 2)
@@ -229,16 +308,20 @@ class Report:
 
 
 def get_report():
+    """
+    Формирование полного отчёта по статистическим данным
+    :return:
+    """
     m = InputConnect()
     a = DataSet(m.filename)
-    statistic = m.statistics_for_years(m.name)
+    statistic = m.statistics_for_years(m.name, a)
     salary, count, salary_city, city_count, vacancy_salary, vacancy_count = statistic
     print(f'Динамика уровня зарплат по годам: {salary}\nДинамика количества вакансий по годам: {count}\n'
           f'Динамика уровня зарплат по годам для выбранной профессии: {vacancy_salary}\nДинамика количества вакансий по годам для выбранной профессии: {vacancy_count}\n'
           f'Уровень зарплат по городам (в порядке убывания): {salary_city}\nДоля вакансий по городам (в порядке убывания): {city_count}')
 
-    Report().generate_image(statistic)
-    Report().generate_exel(statistic, m.name)
+    Report().generate_image(statistic, m)
+    Report().generate_exel(statistic, m.name, m)
     Report().generate_pdf()
 
 
