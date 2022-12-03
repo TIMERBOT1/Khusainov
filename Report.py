@@ -65,7 +65,7 @@ class InputConnect:
         name = input('Введите название профессии: ')
         return [filename, name]
 
-    def statistics_for_years(self, name):
+    def statistics_for_years(self, name, a):
         list1 = a.vacancies_objects
         def cities_statistic():
             if city_salary.__contains__(i.area_name):
@@ -132,7 +132,7 @@ class Report:
         config = pdfkit.configuration(wkhtmltopdf=r'D:\wkhtmltopdf\bin\wkhtmltopdf.exe')
         pdfkit.from_string(pdf_template, 'out.pdf', configuration=config, options=options)
 
-    def generate_image(self, statistic):
+    def generate_image(self, statistic, m):
         salary, count, salary_city, city_count, vacancy_salary, vacancy_count = statistic
 
         def bar_chart(first_dict, second_dict, label1, label2):
@@ -173,7 +173,7 @@ class Report:
         plt.tight_layout()
         plt.savefig('report.png')
 
-    def generate_exel(self, statistic, name):
+    def generate_exel(self, statistic, name, m):
 
         def format_to_precent(e):
             e = round(e*100, 2)
@@ -231,14 +231,14 @@ class Report:
 def get_report():
     m = InputConnect()
     a = DataSet(m.filename)
-    statistic = m.statistics_for_years(m.name)
+    statistic = m.statistics_for_years(m.name, a)
     salary, count, salary_city, city_count, vacancy_salary, vacancy_count = statistic
     print(f'Динамика уровня зарплат по годам: {salary}\nДинамика количества вакансий по годам: {count}\n'
           f'Динамика уровня зарплат по годам для выбранной профессии: {vacancy_salary}\nДинамика количества вакансий по годам для выбранной профессии: {vacancy_count}\n'
           f'Уровень зарплат по городам (в порядке убывания): {salary_city}\nДоля вакансий по городам (в порядке убывания): {city_count}')
 
-    Report().generate_image(statistic)
-    Report().generate_exel(statistic, m.name)
+    Report().generate_image(statistic, m)
+    Report().generate_exel(statistic, m.name, m)
     Report().generate_pdf()
 
 
