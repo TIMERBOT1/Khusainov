@@ -6,11 +6,25 @@ from prettytable import PrettyTable, ALL
 from time import time
 
 class DataSet:
+    """Класс для распаковки csv
+        Attributes:
+            file_name (string): Название распаковываемого csv-файла
+            vacancies_objects (list): Данные из csv-файла
+    """
     def __init__(self, file_name):
+        """Инициализирует объект DataSet
+                Args:
+                    file_name (string): имя csv-файла
+        """
         self.file_name = file_name
         self.vacancies_objects = DataSet.сsv_reader(file_name)
 
     def сsv_reader(file_name):
+        """
+            Извлекает данные из csv-файла и складывает их в список
+                Args: file_name(string): название csv-файла
+                :return: list: список с данными из csv-файла
+        """
         file_csv = open(file_name, encoding='utf_8_sig')
         reader_csv = csv.reader(file_csv)
         listData = []
@@ -33,20 +47,47 @@ class DataSet:
 
 
 class Salary:
+    """
+        Класс для представления зарплаты
 
+        Attributes:
+            salary(int): средняя зарплата в рублях
+            salary_currency(string): Валюта оклада
+    """
     def __init__(self, salary_from, salary_to, salary_gross, salary_currency):
+        """
+            Инициализирует объект Salary, производит конвертацию зарплаты в указанную валюту
+                :param salary_from (str or int or float): Нижняя граница вилки оклада
+                :param salary_to (str or int or float): Верхняя граница вилки оклада
+                :param salary_currency (str): Валюта оклада
+        """
         self.salary_from = salary_from
         self.salary_to = salary_to
         self.salary_gross = salary_gross
         self.salary_currency = salary_currency
 
     def conv_to_rub(self):
+        """Конвертирует зарплату в рубли
+        :return зарплата в рублях
+        """
         return (int(float(self.salary_to)) + int(float(self.salary_from))) * currency_to_rub[self.salary_currency]
 
 
 class Vacancy:
+    """
+        Класс для представления вакансии
 
+        Attributes:
+            name(str): название вакансии
+            salary(Salary): Зарплата
+            area_name(str): Регион
+            published_at(int): Дата публикации
+        """
     def __init__(self, vacanlist):
+        """
+                Инициализирует объект Vacancy
+                :param vacanlist: список с данными по вакансии
+        """
         self.name = vacanlist[0]
         self.description = vacanlist[1]
         self.key_skills = vacanlist[2].split('\n')
@@ -77,8 +118,17 @@ gross = {'false': 'С вычетом налогов', 'true': 'Без вычет
 
 
 class InputConnect:
-
+    """
+       Класс для формирования статистических данных
+       Attributes:
+           params(list): список с названием файла и вакансии
+           filename(string)
+           name(string):
+    """
     def __init__(self):
+        """
+                Инициализирует объект InputConnect
+        """
         self.params = InputConnect.get_params(self)
         self.filename = self.params[0]
         self.filt_argument = self.params[1]
@@ -88,6 +138,10 @@ class InputConnect:
         self.fields = self.params[5]
 
     def get_params(self):
+        """
+                Считывает данные с клавиатуры для формирования статистики
+                :return: список с данными введёнными с клавиатуры
+        """
         filename = input('Введите название файла: ')
         filt_argument = input('Введите параметр фильтрации: ')
         sort_arg = input('Введите параметр сортировки: ')
@@ -110,6 +164,11 @@ class InputConnect:
         return [filename, filt_argument, sort_arg, rev, rows_count, fields]
 
     def filtration(self, a):
+        """
+        Фильтрует данные
+        :param a:
+        :return: отфильтрованный словарь с данными
+        """
         final_list = []
         vacancies = a.vacancies_objects
         if self.filt_argument == '':
@@ -150,6 +209,11 @@ class InputConnect:
         return final_list
 
     def sort(self, list):
+        """
+        Сортирует данные
+        :param list:
+        :return: отсортированный список
+        """
         if self.sort_arg == '':
             return list
         rever = True if self.rev == 'Да' else False
@@ -166,6 +230,11 @@ class InputConnect:
         return list
 
     def print_table(self, list):
+        """Представляет данные в виде таблички
+
+        Attributes:
+            list: данные для таблички
+        """
 
         def cleaner(j):
             j = re.sub(r"\<[^>]*\>", "", j)
@@ -222,6 +291,10 @@ class InputConnect:
         print(table_list)
 
 def getetable():
+    """
+    Формирует табличку из данных
+    :return:
+    """
     m = InputConnect()
     a = DataSet(m.filename)
     p = InputConnect.filtration(m, a)
